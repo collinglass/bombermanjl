@@ -9,7 +9,6 @@ Sending moves: up, down, left, right, bomb
 
 ## TODO
 
-Connect to bomberman game
 Setup initializer
 Setup JSON parse for response
 Board

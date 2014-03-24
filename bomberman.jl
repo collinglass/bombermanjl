@@ -46,45 +46,71 @@ function bomb(conn)
 end
 
 type Cell
-  Base::Dict{String, String}
-  zLayers::Array{Dict{String, String}}
-  X::Int
-  Y::Int
-end
+  Base::Dict{UTF8String, UTF8String}
+  zLayers::Array{Dict{UTF8String, UTF8String},1}
+  X::Int64
+  Y::Int64
 
-type Board
-  Array{Cell}
-  Array{Dict{String, String}}
-  Array{Cell}
+  Cell() = new(Dict{UTF8String, UTF8String}(), [], 0, 0)
 end
 
 
 type Response
-  Turn::Int
-  TurnDuration::Int
-  Name::String
-  X::Int
-  Y::Int
-  LastX::Int
-  LastY::Int
-  Bombs::Int
-  MaxBomb::Int
-  MaxRadius::Int
+  Turn::Int64
+  TurnDuration::Int64
+  Name::UTF8String
+  X::Int64
+  Y::Int64
+  LastX::Int64
+  LastY::Int64
+  Bombs::Int64
+  MaxBomb::Int64
+  MaxRadius::Int64
   Alive::Bool
-  GameObject::Dict{String, String}
+  GameObject::Dict{UTF8String, UTF8String}
   Message::String
-  Board::Board
+  Board::Array{Cell,2}
   
-  Response() = new(0,0,"",0,0,0,0,0,0,0,false,Dict{String, String}(),"",Board())
+  Response() = new(0,0,"",0,0,0,0,0,0,0,false,Dict{UTF8String, UTF8String}(),"", Array(Cell,2,2))
 end
 
 GAMEIP = "0.0.0.0"
 GAMEPORT = 40000
 
+
+function tparse{T}(::Type{T}, json::String)
+    return eval(parse(json))::T
+end
+ 
+function tparse(::Type{DataType}, json::String)
+    eval(symbol(json))::DataType
+end
+ 
+function tparse{T}(::Type{Dict{String,T}}, json::Dict{String,Any})
+    r = Dict{String,T}()
+    for (n, d) = json
+        r[n] = tparse(T, d)
+    end
+    r
+end
+ 
+function tparse(typ::DataType, json::Dict{String,Any})
+    r = typ()
+    for (n, d) = json
+        s = symbol(n)
+        t = typ.types[findfirst(typ.names, s)]
+        setfield(r, s, tparse(t, d))
+    end
+    r
+end
+
 try
 	client = connect(GAMEIP,GAMEPORT)
   gamestate = JSON.parse(readline(client))
-	print(gamestate)
+  #gamestate = Response()
+  #gamestate = tparse(Response, JSON.parse(readline(client)))
+  
+	print(gamestate, "\n")
 
 catch err
   print("connection ended with error $err\n")
