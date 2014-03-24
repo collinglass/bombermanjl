@@ -9,7 +9,6 @@ Sending moves: up, down, left, right, bomb
 
 ## TODO
 
-Setup initializer
-Setup JSON parse for response
-Board
-Buffered moves (maybe)
+JSON parse for response
+
+Getters
