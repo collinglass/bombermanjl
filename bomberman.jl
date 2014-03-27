@@ -45,15 +45,6 @@ function bomb(conn)
   end
 end
 
-type Cell
-  Base::Dict{UTF8String, UTF8String}
-  zLayers::Array{Dict{UTF8String, UTF8String},1}
-  X::Int64
-  Y::Int64
-
-  Cell() = new(Dict{UTF8String, UTF8String}(), [], 0, 0)
-end
-
 
 type Response
   Turn::Int64
@@ -68,10 +59,10 @@ type Response
   MaxRadius::Int64
   Alive::Bool
   GameObject::Dict{UTF8String, UTF8String}
-  Message::String
-  Board::Array{Cell,2}
+  Message::UTF8String
+  Board::Array{UTF8String,2}
   
-  Response() = new(0,0,"",0,0,0,0,0,0,0,false,Dict{UTF8String, UTF8String}(),"", Array(Cell,2,2))
+  Response() = new(0,0,"",0,0,0,0,0,0,0,false,Dict{UTF8String, UTF8String}(),"", Array(UTF8String,51,23))
 end
 
 type Jason
@@ -99,6 +90,11 @@ function tparse(json::Dict{String,Any})
     r.GameObject["Name"] = json["GameObject"]["Name"]
     r.Message = json["Message"]
     #r.Board = json["Board"]
+    for i = 1:51
+      for j = 1:23
+        r.Board[i,j] = json["Board"][i][j]["Name"]
+      end
+    end
 
     return r
 end
@@ -113,8 +109,14 @@ try
   #gamestate = JSON.parse(readline(client))
   #gamestate = Response()
   gamestate = tparse(JSON.parse(readline(client)))
+
+  #gamestate = reshape(1:16, 4, 4)
   
-	print(gamestate.Name, "\n")
+	#print(gamestate, "\n")
+
+  #gamestate[1,2] = 19
+
+  print(gamestate, "\n")
 
 catch err
   print("connection ended with error $err\n")
