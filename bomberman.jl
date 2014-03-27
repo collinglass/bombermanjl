@@ -74,43 +74,31 @@ type Response
   Response() = new(0,0,"",0,0,0,0,0,0,0,false,Dict{UTF8String, UTF8String}(),"", Array(Cell,2,2))
 end
 
+type Jason
+  Name::String
+
+  Jason() = new("")
+end
+
 GAMEIP = "0.0.0.0"
 GAMEPORT = 40000
-
-
-function tparse{T}(::Type{T}, json::String)
-    return eval(parse(json))::T
-end
  
-function tparse(::Type{DataType}, json::String)
-    eval(symbol(json))::DataType
-end
- 
-function tparse{T}(::Type{Dict{String,T}}, json::Dict{String,Any})
-    r = Dict{String,T}()
-    for (n, d) = json
-        r[n] = tparse(T, d)
-    end
-    r
-end
- 
-function tparse(typ::DataType, json::Dict{String,Any})
-    r = typ()
-    for (n, d) = json
-        s = symbol(n)
-        t = typ.types[findfirst(typ.names, s)]
-        setfield(r, s, tparse(t, d))
-    end
-    r
+function tparse(json::Dict{String,Any})
+    j = Jason()
+    j.Name = json["json"]
+    return j
 end
 
 try
-	client = connect(GAMEIP,GAMEPORT)
-  gamestate = JSON.parse(readline(client))
+	client = connect(8080)
+  print(readline(client))
+  up(client)
+
+  gamestate = tparse(JSON.parse(readline(client)))
   #gamestate = Response()
   #gamestate = tparse(Response, JSON.parse(readline(client)))
   
-	print(gamestate, "\n")
+	print(gamestate.Name, "\n")
 
 catch err
   print("connection ended with error $err\n")
