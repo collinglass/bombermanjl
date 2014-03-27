@@ -84,19 +84,35 @@ GAMEIP = "0.0.0.0"
 GAMEPORT = 40000
  
 function tparse(json::Dict{String,Any})
-    j = Jason()
-    j.Name = json["json"]
-    return j
+    r = Response()
+    r.Turn = json["Turn"]
+    r.TurnDuration = json["TurnDuration"]
+    r.Name = json["Name"]
+    r.X = json["X"]
+    r.Y = json["Y"]
+    r.LastX = json["LastX"]
+    r.LastY = json["LastY"]
+    r.Bombs = json["Bombs"]
+    r.MaxBomb = json["MaxBomb"]
+    r.MaxRadius = json["MaxRadius"]
+    r.Alive = json["Alive"]
+    r.GameObject["Name"] = json["GameObject"]["Name"]
+    r.Message = json["Message"]
+    #r.Board = json["Board"]
+
+    return r
 end
 
 try
-	client = connect(8080)
-  print(readline(client))
-  up(client)
+	#client = connect(8080)
+  #print(readline(client))
+  #up(client)
 
-  gamestate = tparse(JSON.parse(readline(client)))
+  client = connect (GAMEIP, GAMEPORT)
+
+  #gamestate = JSON.parse(readline(client))
   #gamestate = Response()
-  #gamestate = tparse(Response, JSON.parse(readline(client)))
+  gamestate = tparse(JSON.parse(readline(client)))
   
 	print(gamestate.Name, "\n")
 
