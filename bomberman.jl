@@ -8,10 +8,15 @@ type Player
 end
 
 function recv_update(player)
+	# Buffer size
+	bufsize = 1024
+	# Buffer string
+	strbuf = ""
+	# String of whole JSON object
+	json = ""
+
 	try
-		bufsize = 1024
-		strbuf = ""
-		json = ""
+		# coroutine JSON input
 		while true
 			buf = zeros(Uint8, bufsize)
 		    read(player.conn, buf)
@@ -20,8 +25,7 @@ function recv_update(player)
 		    for c in strbuf
 		    	if c == uint8('\n')
 		    		json = split(json, '\n')
-		    		data = tparse(JSON.parse(json[1]))
-		    		print(data)
+		    		player.data = tparse(JSON.parse(json[1]))
 		    		if length(json) > 2
 		    			json = json[3]
 		    		end
@@ -142,21 +146,3 @@ function tparse(json::Dict{String,Any})
 	
 	return r
 end
-
-try
-	GAMEIP = "0.0.0.0"
-	GAMEPORT = 40000
-	player = Player(GAMEIP, GAMEPORT)
-
-	print(typeof(player), "\n")
-
-	recv_update(player)
-
-	#gamestate = tparse(JSON.parse(readline(client)))
-
-	#print(gamestate, "\n")
-
-catch err
-	print("connection ended with error $err\n")
-end
-

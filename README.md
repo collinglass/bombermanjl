@@ -12,6 +12,4 @@ Response type
 
 ## TODO
 
-JSON parse to response type
-
-Getters
+Make JSON parse @async from rest of program
