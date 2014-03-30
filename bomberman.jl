@@ -7,7 +7,7 @@ type Player
 	Player(IP, PORT) = new(connect(IP, PORT), Response())
 end
 
-function recv_update(player)
+function recv_update(conn, data)
 	# Buffer size
 	bufsize = 1024
 	# Buffer string
